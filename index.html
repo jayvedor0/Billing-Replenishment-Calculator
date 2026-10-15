@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Internal trust replenishment calculator for law-firm administrative teams." />
+  <title>Trust Replenishment Calculator | AHFL</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">AH</div>
+        <div>
+          <div class="brand-name">Atlanta Holistic Family Law</div>
+          <div class="brand-subtitle">Internal Billing Tool</div>
+        </div>
+      </div>
+      <div class="privacy-pill"><span></span> Local only · No data sent</div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">TRUST ADMINISTRATION</p>
+          <h1>Trust Replenishment<br /><em>Calculator</em></h1>
+          <p class="hero-copy">Quickly calculate what needs to be requested, see exactly how the number was built, and copy a client-ready message.</p>
+        </div>
+        <div class="hero-badge" aria-hidden="true"><span>✦</span><small>Calm<br/>clear<br/>care</small></div>
+      </section>
+
+      <nav class="quick-scenarios" aria-label="Quick scenarios">
+        <button class="scenario active" data-scenario="general">General Replenishment</button>
+        <button class="scenario" data-scenario="mediation">Mediation</button>
+        <button class="scenario" data-scenario="trial">Trial / Hearing</button>
+        <button class="scenario" data-scenario="documents">Final Documents</button>
+      </nav>
+
+      <div class="workspace">
+        <section class="card inputs-card">
+          <div class="section-heading">
+            <div><span class="step">01</span><h2>Case numbers</h2></div>
+            <button id="resetBtn" class="text-button" type="button">Reset</button>
+          </div>
+
+          <div class="field-grid">
+            <label class="field full">
+              <span>Client Name</span>
+              <input id="clientName" type="text" placeholder="Client first name" autocomplete="off" />
+            </label>
+
+            <label class="field full">
+              <span>Current Trust Balance <b>*</b></span>
+              <div class="money-input"><span>$</span><input id="currentTrust" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" value="" /></div>
+            </label>
+
+            <label class="field">
+              <span>Work in Progress / Unbilled Time</span>
+              <div class="money-input"><span>$</span><input id="wip" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" /></div>
+            </label>
+            <label class="field">
+              <span>Outstanding Balance</span>
+              <div class="money-input"><span>$</span><input id="outstanding" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" /></div>
+            </label>
+
+            <label class="field">
+              <span>Upcoming Event</span>
+              <select id="event">
+                <option>No upcoming event</option>
+                <option>Mediation</option>
+                <option>Trial</option>
+                <option>Hearing</option>
+                <option>Final Documents</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Required Trust Amount</span>
+              <div class="money-input"><span>$</span><input id="requiredTrust" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" /></div>
+            </label>
+          </div>
+
+          <div class="payment-link-row">
+            <label class="field full">
+              <span>Last Invoice Sent On (optional)</span>
+              <input id="invoiceDate" type="date" />
+            </label>
+          </div>
+
+          <div class="payment-link-row">
+            <label class="field full">
+              <span>Payment Link (optional)</span>
+              <input id="paymentLink" type="url" placeholder="https://..." />
+            </label>
+          </div>
+
+          <div class="options">
+            <label class="check-row"><input id="includeWip" type="checkbox" /><span class="checkmark"></span><span><b>Include WIP</b><small>Add the work in progress to the requested amount.</small></span></label>
+            <label class="check-row"><input id="includeOutstanding" type="checkbox" /><span class="checkmark"></span><span><b>Include outstanding balance</b><small>Add the outstanding balance to the requested amount.</small></span></label>
+            <div class="additional-row">
+              <label class="check-row"><input id="includeAdditional" type="checkbox" /><span class="checkmark"></span><span><b>Legal team needs additional funds</b><small>For remaining documents or other defined work.</small></span></label>
+              <div class="money-input compact"><span>$</span><input id="additional" inputmode="decimal" type="number" min="0" step="0.01" value="1000.00" aria-label="Additional legal team requirement" /></div>
+            </div>
+          </div>
+
+          <div id="warning" class="warning" hidden></div>
+          <button id="calculateBtn" class="primary-button" type="button">Calculate Replenishment <span>→</span></button>
+        </section>
+
+        <aside class="card result-card" aria-live="polite">
+          <div class="section-heading result-heading"><div><span class="step">02</span><h2>Recommendation</h2></div><span class="status-dot">Ready</span></div>
+          <p class="result-label">Recommended Replenishment</p>
+          <div id="recommended" class="recommended">$0.00</div>
+          <div class="divider"></div>
+          <div id="breakdown" class="breakdown">
+            <div><span>Current Trust</span><b>$0.00</b></div>
+            <div><span>Required Trust</span><b>$0.00</b></div>
+            <div><span>Trust Shortfall</span><b>$0.00</b></div>
+            <div><span>Work in Progress</span><b>$0.00</b></div>
+            <div><span>Outstanding Balance</span><b>$0.00</b></div>
+            <div><span>Additional Requirement</span><b>$0.00</b></div>
+          </div>
+          <div id="formula" class="formula">Enter the case numbers to see the calculation.</div>
+        </aside>
+      </div>
+
+      <section class="card message-card">
+        <div class="section-heading">
+          <div><span class="step">03</span><h2>Client message</h2></div>
+          <div class="message-format-group" role="group" aria-label="Message format">
+            <button class="format active" data-format="text" type="button">Text Message</button>
+            <button class="format" data-format="email" type="button">Email</button>
+          </div>
+        </div>
+        <div class="message-subheading">
+          <span>Choose tone</span>
+          <div class="tone-group" role="group" aria-label="Message tone">
+            <button class="tone active" data-tone="Professional">Professional</button>
+            <button class="tone" data-tone="Friendly">Friendly</button>
+            <button class="tone" data-tone="Direct">Direct</button>
+            <button class="tone" data-tone="Urgent">Urgent</button>
+          </div>
+        </div>
+        <textarea id="message" rows="6" spellcheck="true" placeholder="Your client message will appear here after you calculate."></textarea>
+        <div class="message-actions">
+          <span id="copyStatus" class="copy-status" role="status"></span>
+          <button id="copyMessageBtn" class="secondary-button" type="button">Copy Message</button>
+          <button id="copyResultsBtn" class="primary-button small" type="button">Copy Results</button>
+        </div>
+      </section>
+
+      <footer>
+        <span>Internal administrative tool · Use professional judgment when deciding what to request.</span>
+        <span>AHFL-inspired sea-glass palette</span>
+      </footer>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
